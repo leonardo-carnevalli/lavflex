@@ -1,0 +1,9 @@
+.git
+node_modules
+public
+.vercel
+.env*
+.segredos
+.dados-local.json
+Dockerfile
+.dockerignore

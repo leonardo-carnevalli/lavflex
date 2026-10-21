@@ -8,7 +8,7 @@ const { makeDefaults, ETAPAS } = require('../seed.js');
 
 const PATH = 'dados/estado.json';
 const LOCAL = path.join(__dirname, '..', '.dados-local.json');
-const local = () => !process.env.BLOB_READ_WRITE_TOKEN;
+const local = () => !process.env.BLOB_READ_WRITE_TOKEN && process.env.ARMAZEM !== 'disco'; // na VPS o armazém é o disco (vetor-funcs)
 
 async function read() {
   const { state, etag } = await lerArquivo();
