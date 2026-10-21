@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Lav-Flex">
+  <circle cx="100" cy="100" r="92" fill="#fff" stroke="#E0782F" stroke-width="12"/>
+  <g fill="none" stroke="#1EA7E6" stroke-width="4.5" stroke-linecap="round">
+    <circle cx="70" cy="44" r="7"/><circle cx="98" cy="34" r="5"/><circle cx="121" cy="42" r="8"/>
+    <circle cx="146" cy="56" r="5"/><circle cx="54" cy="64" r="4"/><circle cx="92" cy="58" r="3.5"/>
+    <circle cx="82" cy="150" r="5"/><circle cx="104" cy="160" r="4"/><circle cx="128" cy="150" r="7"/>
+    <circle cx="62" cy="140" r="3.5"/>
+  </g>
+  <path d="M22 84c26-16 50-16 78-4s52 12 78-4" fill="none" stroke="#1D4E9E" stroke-width="6" stroke-linecap="round"/>
+  <path d="M22 126c26 12 52 12 78 0s50-14 78 0" fill="none" stroke="#1EA7E6" stroke-width="5" stroke-linecap="round"/>
+  <text x="100" y="116" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-style="italic" font-size="38" fill="#1D4E9E" letter-spacing="-1">Lav<tspan fill="#E0782F">-</tspan>Flex</text>
+</svg>

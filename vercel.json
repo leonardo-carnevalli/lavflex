@@ -1,0 +1,17 @@
+{
+  "buildCommand": "node build.cjs",
+  "outputDirectory": "public",
+  "framework": null,
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/r/:codigo", "destination": "/" }
+  ],
+  "headers": [
+    { "source": "/img/(.*)", "headers": [{ "key": "cache-control", "value": "public, max-age=604800" }] },
+    { "source": "/(.*).html", "headers": [{ "key": "cache-control", "value": "no-cache" }] },
+    { "source": "/seed.js", "headers": [{ "key": "cache-control", "value": "no-cache" }] },
+    { "source": "/conta(.html)?", "headers": [{ "key": "x-robots-tag", "value": "noindex" }] },
+    { "source": "/painel(.html)?", "headers": [{ "key": "x-robots-tag", "value": "noindex" }] }
+  ],
+  "regions": ["gru1"]
+}

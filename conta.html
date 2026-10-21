@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Minha conta | Lav-Flex Lavanderia</title>
+<meta name="description" content="Crie sua conta na Lav-Flex para assinar um plano mensal de lavanderia.">
+<meta name="theme-color" content="#1EA7E6">
+<link rel="icon" href="/img/logo-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/img/logo-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+<style>
+/* mesmos tokens do site */
+:root {
+  --tinta: #0F2A5C; --navy: #1D4E9E; --ceu: #1EA7E6; --laranja-forte: #BA5814; --laranja: #E0782F;
+  --algodao: #F5F8FB; --linha: #D3E1EE; --suave: #44597A; --apagado: #5E7394; --claro: #C7D7EC; --erro: #B3261E; --ok: #1E7A4F; --gutter: 16px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--algodao); color: var(--tinta); font-family: 'Archivo', system-ui, sans-serif; font-size: 17px; line-height: 1.55; overflow-x: clip; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 var(--gutter); }
+p { margin: 0 0 1em; }
+/* títulos de pé; o itálico largo fica só no topo do site */
+.tit { font-stretch: 104%; font-weight: 750; letter-spacing: -.02em; line-height: 1.06; margin: 0; text-wrap: balance; }
+.link { font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; text-decoration-color: var(--ceu); }
+/* link solto (fora de frase): alvo de toque de 44px */
+.alvo { display: inline-flex; align-items: center; min-height: 44px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 22px;
+  border-radius: 10px; border: 2px solid transparent; font-weight: 700; font-stretch: 106%; text-decoration: none; cursor: pointer; text-align: center;
+  transition: transform .09s ease, background-color .15s ease, box-shadow .15s ease; -webkit-tap-highlight-color: transparent;
+}
+.btn-navy { background: var(--navy); color: #fff; box-shadow: 0 3px 0 var(--tinta); }
+.btn-navy:hover { background: #1A4590; }
+.btn-laranja { background: var(--laranja-forte); color: #fff; box-shadow: 0 3px 0 #7E3A0B; }
+.btn-laranja:hover { background: #A84E10; }
+.btn-navy:active, .btn-laranja:active { box-shadow: 0 1px 0 var(--tinta); transform: translateY(2px) scale(.985); }
+.btn-linha { border-color: var(--tinta); color: var(--tinta); background: transparent; }
+.btn-linha:hover { background: rgba(15,42,92,.06); }
+.btn[aria-busy="true"] { pointer-events: none; opacity: .8; }
+.btn-bloco { width: 100%; }
+
+/* topo */
+.topo { background: #fff; box-shadow: 0 1px 0 var(--linha); }
+.topo .wrap { display: flex; align-items: center; gap: 14px; height: 72px; }
+.topo-marca { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.topo-marca img { width: 50px; height: 50px; }
+.palavra { display: flex; flex-direction: column; line-height: 1; }
+.palavra b { font-style: italic; font-stretch: 125%; font-weight: 900; font-size: 1.45rem; color: var(--navy); letter-spacing: -.02em; }
+.palavra b i { font-style: inherit; color: var(--laranja); }
+.palavra small { font-size: .74rem; color: var(--suave); font-weight: 600; font-stretch: 85%; margin-top: 3px; }
+.topo .voltar { margin-left: auto; font-weight: 600; font-size: .95rem; }
+
+/* corpo: título e etiqueta do plano à esquerda, ficha à direita */
+.conta { display: grid; gap: 28px; padding-top: 36px; padding-bottom: 64px; }
+.conta h1 { font-size: clamp(1.9rem, 4.2vw, 2.9rem); max-width: 14em; }
+.conta .lead { font-size: 1.08rem; color: var(--suave); margin: 14px 0 0; max-width: 30em; }
+
+/* a etiqueta do plano escolhido, igual à do site */
+.etq-pend { position: relative; padding-top: 34px; margin-top: 26px; max-width: 360px; transform-origin: 50% 0; filter: drop-shadow(0 18px 22px rgba(8,38,84,.16)) drop-shadow(0 2px 3px rgba(8,38,84,.14)); }
+.etq-pend::before { content: ''; position: absolute; z-index: 2; top: 0; left: 50%; width: 2px; margin-left: -1px; height: 61px; background: var(--tinta); }
+.etq-pend::after { content: ''; position: absolute; top: -2px; left: 50%; width: 72px; margin-left: -36px; height: 5px; border-radius: 3px; background: var(--tinta); }
+.etq { position: relative; background: var(--navy); color: #fff; padding: 56px 22px 22px; border-radius: 4px 4px 14px 14px; clip-path: polygon(26% 0, 74% 0, 100% 34px, 100% 100%, 0 100%, 0 34px); }
+.etq::before { content: ''; position: absolute; top: 16px; left: 50%; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: var(--algodao); box-shadow: 0 0 0 5px var(--laranja); }
+.etq small { display: block; color: var(--claro); font-size: .9rem; font-weight: 600; font-stretch: 85%; }
+.etq-nome { margin: 2px 0 0; font-stretch: 106%; font-weight: 800; letter-spacing: -.015em; font-size: 1.6rem; line-height: 1.05; }
+.etq-preco { display: flex; align-items: baseline; gap: 8px; margin: 16px 0 0; padding-top: 14px; border-top: 2px dashed rgba(255,255,255,.28); color: var(--claro); }
+.etq-preco b { color: #fff; font-stretch: 72%; font-weight: 750; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.etq-preco .lacuna { flex: 1; max-width: 6.5rem; height: 1.8rem; border-bottom: 3px solid #fff; }
+.etq-def { margin: 6px 0 0; font-size: .86rem; font-weight: 700; color: #FFC59B; }
+.etq-itens { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; font-size: .95rem; line-height: 1.35; }
+.etq-itens li { display: grid; grid-template-columns: 18px 1fr; gap: 9px; }
+.etq-itens svg { width: 18px; height: 18px; margin-top: 2px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.trocar { margin-top: 6px; font-size: .95rem; }
+
+/* ficha: papel branco com a fileira de furos da comanda */
+.ficha { position: relative; background: #fff; border-radius: 10px; padding: 40px 20px 26px; box-shadow: 0 1px 0 var(--linha), 0 24px 40px -24px rgba(8,38,84,.3); }
+.ficha::before { content: ''; position: absolute; top: 16px; left: 16px; right: 16px; height: 6px; background: radial-gradient(circle, var(--ceu) 2.6px, transparent 3px) 0 0 / 14px 6px repeat-x; }
+.ficha + .ficha { margin-top: 18px; }
+.ficha h2 { font-size: 1.5rem; font-stretch: 104%; font-weight: 750; letter-spacing: -.015em; line-height: 1.1; margin: 0 0 6px; }
+.ficha .sub { color: var(--suave); margin: 0 0 4px; }
+
+/* escolha entre criar conta e entrar */
+.seg { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--algodao); box-shadow: inset 0 0 0 1px var(--linha); margin-bottom: 18px; }
+.seg button { flex: 1; min-height: 44px; border: 0; border-radius: 9px; background: none; font-weight: 700; cursor: pointer; color: var(--tinta); }
+.seg button[aria-pressed="true"] { background: var(--navy); color: #fff; box-shadow: 0 2px 0 var(--tinta); }
+
+label { display: block; font-weight: 600; font-stretch: 85%; font-size: .95rem; margin: 14px 0 6px; }
+.inp { width: 100%; height: 52px; padding: 0 14px; border: 2px solid var(--tinta); border-radius: 8px; background: var(--algodao); font-size: 1.05rem; }
+.inp:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 4px rgba(30,167,230,.4); }
+.inp[aria-invalid="true"] { border-color: var(--erro); }
+.inp.cod { font-stretch: 62%; font-weight: 700; font-size: 1.6rem; letter-spacing: .08em; text-transform: uppercase; }
+.erro { margin: 12px 0 0; color: var(--erro); font-weight: 600; font-size: .94rem; line-height: 1.35; }
+.erro:empty { display: none; }
+.ajuda { margin: 12px 0 0; font-size: .88rem; color: var(--suave); line-height: 1.4; }
+form .btn { margin-top: 20px; }
+
+/* situação do plano */
+.situ { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 14px 0 0; }
+.selo { display: inline-block; padding: 5px 14px 6px; border: 3px solid var(--navy); border-radius: 8px; color: var(--navy); font-style: italic; font-stretch: 125%; font-weight: 850; font-size: 1.3rem; line-height: 1; transform: rotate(-5deg); box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px var(--navy); }
+.selo.laranja { border-color: var(--laranja-forte); color: var(--laranja-forte); box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px var(--laranja-forte); }
+.aviso-ok { margin: 16px 0 0; padding: 14px 16px; border-left: 4px solid var(--navy); background: var(--algodao); border-radius: 0 6px 6px 0; }
+.escolha { display: grid; gap: 8px; margin: 16px 0 0; padding: 0; border: 0; }
+.escolha legend { font-weight: 700; margin-bottom: 4px; }
+.op { display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; border: 2px solid var(--linha); border-radius: 10px; cursor: pointer; }
+.op:has(input:checked) { border-color: var(--navy); background: var(--algodao); }
+.op input { width: 20px; height: 20px; margin: 0; accent-color: var(--navy); }
+.op b { font-stretch: 104%; font-weight: 700; }
+.op span:last-child { color: var(--suave); font-size: .9rem; font-stretch: 85%; white-space: nowrap; }
+.acoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.acoes .btn { flex: 1 1 220px; }
+.rastro { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 12px; }
+.rastro .btn { padding: 0 18px; margin-top: 0; }
+.dados { color: var(--suave); font-size: .95rem; margin: 22px 0 0; overflow-wrap: anywhere; }
+.sair { border: 0; background: none; padding: 0; margin-top: 6px; cursor: pointer; }
+.nada { margin: 10px 0 0; font-size: .92rem; font-weight: 600; color: var(--tinta); text-align: center; }
+
+/* rodapé com o crédito da Vetor */
+.rodape :focus-visible { outline-color: #fff; }
+.rodape { background: var(--tinta); color: var(--claro); padding: 26px 0 30px; font-size: .86rem; }
+.vetor-cred { display: flex; flex-wrap: wrap; align-items: center; gap: 0 18px; }
+.vetor-cred a { display: inline-flex; align-items: center; min-height: 44px; color: var(--claro); text-decoration: none; }
+.vetor-cred a:hover { color: #fff; text-decoration: underline; }
+.vetor-cred .vetor { display: inline-flex; align-items: center; gap: 8px; color: #fff; }
+.vetor-cred .vetor img { border-radius: 5px; }
+
+@media (min-width: 860px) {
+  :root { --gutter: 32px; }
+  .conta { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 56px; align-items: start; padding-top: 64px; padding-bottom: 96px; }
+  .ficha { padding: 48px 36px 34px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="wrap">
+    <a class="topo-marca" href="/" aria-label="Lav-Flex Lavanderia, início">
+      <img src="/img/logo.webp" alt="" width="50" height="50">
+      <span class="palavra" aria-hidden="true"><b>Lav-<i>Flex</i></b><small>Lavanderia em Marília</small></span>
+    </a>
+    <a class="voltar link alvo" href="/#planos">Ver os planos</a>
+  </div>
+</header>
+
+<main class="wrap conta">
+  <div>
+    <h1 class="tit" id="titulo">Sua conta na Lav-Flex</h1>
+    <p class="lead" id="lead">Com a conta você assina um plano mensal e acompanha tudo por aqui.</p>
+    <div id="etiqueta"></div>
+  </div>
+
+  <div>
+    <!-- sem sessão: criar conta ou entrar -->
+    <div class="ficha" id="caixa-acesso" hidden>
+      <div class="seg" role="group" aria-label="Criar conta ou entrar">
+        <button type="button" data-modo="criar" aria-pressed="true">Criar conta</button>
+        <button type="button" data-modo="entrar" aria-pressed="false">Já tenho conta</button>
+      </div>
+      <form id="f-criar" novalidate>
+        <h2>Criar conta</h2>
+        <p class="sub">Leva menos de um minuto.</p>
+        <label for="c-nome">Nome</label><input class="inp" id="c-nome" autocomplete="name" required>
+        <label for="c-email">E-mail</label><input class="inp" id="c-email" type="email" autocomplete="email" inputmode="email" required>
+        <label for="c-tel">WhatsApp com DDD</label><input class="inp" id="c-tel" type="tel" autocomplete="tel" inputmode="tel" placeholder="(14) 99999-9999" required>
+        <label for="c-senha">Senha</label><input class="inp" id="c-senha" type="password" autocomplete="new-password" minlength="6" required aria-describedby="c-senha-ajuda">
+        <p class="ajuda" id="c-senha-ajuda">Pelo menos 6 caracteres.</p>
+        <p class="erro" id="c-erro" role="alert"></p>
+        <button class="btn btn-laranja btn-bloco" id="c-btn" type="submit">Criar conta</button>
+        <p class="nada" id="c-nada" hidden>Nada é cobrado agora.</p>
+        <p class="ajuda">Usamos seus dados só para a assinatura e para a loja falar com você.</p>
+      </form>
+      <form id="f-entrar" novalidate hidden>
+        <h2>Entrar</h2>
+        <label for="e-email">E-mail</label><input class="inp" id="e-email" type="email" autocomplete="email" inputmode="email" required>
+        <label for="e-senha">Senha</label><input class="inp" id="e-senha" type="password" autocomplete="current-password" required>
+        <p class="erro" id="e-erro" role="alert"></p>
+        <button class="btn btn-navy btn-bloco" id="e-btn" type="submit">Entrar</button>
+        <p class="ajuda">Esqueceu a senha? <a class="link" data-wa="Olá! Esqueci a senha da minha conta no site da Lav-Flex." href="https://wa.me/5514998852752" target="_blank" rel="noopener">Fale com a loja no WhatsApp</a></p>
+      </form>
+    </div>
+
+    <!-- com sessão: plano e atalhos -->
+    <div id="caixa-conta" hidden>
+      <div class="ficha" id="ficha-plano" tabindex="-1"></div>
+      <div class="ficha">
+        <h2>Acompanhar uma roupa</h2>
+        <p class="sub">Digite o código da comanda.</p>
+        <form class="rastro" id="f-rastro">
+          <label class="sr" for="r-cod" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Código da comanda</label>
+          <input class="inp cod" id="r-cod" placeholder="LF-7K3M9P" autocomplete="off" autocapitalize="characters" spellcheck="false">
+          <button class="btn btn-navy" type="submit">Ver</button>
+        </form>
+      </div>
+      <p class="dados" id="dados"></p>
+      <button class="sair link alvo" id="sair" type="button">Sair da conta</button>
+    </div>
+  </div>
+</main>
+
+<footer class="rodape">
+  <div class="wrap vetor-cred">
+    <a class="vetor" href="https://vetoragencia.com.br" target="_blank" rel="noopener"><img src="/img/vetor.svg" alt="" width="22" height="22">Desenvolvido por <b>Vetor Agência</b></a>
+    <a href="https://instagram.com/vetor_agencia" target="_blank" rel="noopener">@vetor_agencia</a>
+    <a href="https://wa.me/5514997463040?text=Oi!%20Vi%20o%20site%20da%20Lav-Flex%20e%20quero%20um%20site%20assim." target="_blank" rel="noopener">Quer um site assim? Fale com a gente</a>
+  </div>
+</footer>
+
+<script src="/seed.js"></script>
+<script>
+// conta do cliente: criar, entrar, escolher plano e (quando houver valor e Stripe) pagar
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const brl = (n) => Number(n || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const dataBR = (ms) => new Date(ms).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+const telBR = (t) => { t = String(t || '').replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, ''); return t.length >= 10 ? '(' + t.slice(0, 2) + ') ' + t.slice(2, -4) + '-' + t.slice(-4) : t; };
+const CHECK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg>';
+
+let D = makeDefaults();
+D.planos = D.planos.map((p) => Object.assign({}, p, { pagavel: false }));
+let TOKEN = '';
+try { TOKEN = localStorage.getItem('lf-conta') || ''; } catch (e) {}
+let CONTA = null;
+const params = new URLSearchParams(location.search);
+let planoUrl = params.get('plano');
+const plano = (id) => D.planos.find((p) => p.id === id);
+
+async function api(dados, metodo) {
+  const r = await fetch('/api/conta', {
+    method: metodo || 'POST',
+    headers: Object.assign({ 'content-type': 'application/json' }, TOKEN ? { authorization: 'Bearer ' + TOKEN } : {}),
+    body: dados ? JSON.stringify(dados) : undefined
+  });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401 && TOKEN && (!dados || dados.acao !== 'entrar')) { guardar(''); mostrar(); }
+  if (!r.ok) throw new Error(j.error || 'Não deu certo. Tente de novo.');
+  return j;
+}
+function guardar(t) {
+  TOKEN = t;
+  try { t ? localStorage.setItem('lf-conta', t) : localStorage.removeItem('lf-conta'); } catch (e) {}
+  if (!t) CONTA = null;
+}
+
+// ---------- etiqueta do plano (esquerda) ----------
+function etiqueta(p, rotulo) {
+  if (!p) return '';
+  const preco = p.preco > 0
+    ? '<p class="etq-preco">R$ <b>' + brl(p.preco).replace(/^R\$\s?/, '') + '</b> por mês</p>'
+    : '<p class="etq-preco">R$ <span class="lacuna" aria-hidden="true"></span> por mês</p><p class="etq-def">Valor a definir</p>';
+  return '<div class="etq-pend" id="etq-pend"><div class="etq"><small>' + esc(rotulo) + '</small><p class="etq-nome">' + esc(p.nome) + '</p>' + preco +
+    '<ul class="etq-itens">' + (p.itens || []).map((t) => '<li>' + CHECK + '<span>' + esc(t) + '</span></li>').join('') + '</ul></div></div>';
+}
+function balancar() {
+  const el = $('#etq-pend');
+  if (!el || RM) return;
+  el.animate([
+    { transform: 'translateY(-30px) rotate(0)', opacity: 0 },
+    { transform: 'translateY(3px) rotate(4deg)', opacity: 1, offset: .35 },
+    { transform: 'rotate(-2.4deg)', offset: .6 },
+    { transform: 'rotate(1deg)', offset: .82 },
+    { transform: 'none' }
+  ], { duration: 1200, easing: 'cubic-bezier(0,.65,.51,.99)', fill: 'backwards' });
+}
+
+// ---------- tela ----------
+function mostrar() {
+  const logado = !!CONTA;
+  $('#caixa-acesso').hidden = logado;
+  $('#caixa-conta').hidden = !logado;
+  const anterior = $('#etiqueta').dataset.plano || '';
+  let p = null, rotulo = '';
+  if (logado) {
+    const a = CONTA.assinatura;
+    p = plano(a && a.status !== 'canceled' ? a.plano : CONTA.plano && CONTA.plano.id);
+    rotulo = a && a.status !== 'canceled' ? 'Seu plano' : 'Plano escolhido';
+    $('#titulo').textContent = 'Olá, ' + CONTA.nome.split(' ')[0] + '.';
+    $('#lead').textContent = 'Aqui fica o seu plano. A loja fala com você pelo WhatsApp ' + telBR(CONTA.tel) + '.';
+    $('#dados').textContent = CONTA.email + ', WhatsApp ' + telBR(CONTA.tel);
+    fichaPlano();
+  } else {
+    p = plano(planoUrl);
+    rotulo = 'Plano escolhido';
+    $('#titulo').textContent = !p ? 'Sua conta na Lav-Flex' : p.pagavel ? 'Falta pouco para assinar o ' + p.nome + '.' : 'Falta pouco para entrar na lista do ' + p.nome + '.';
+    $('#lead').textContent = p ? 'Crie sua conta para guardar a sua escolha.' : 'Com a conta você assina um plano mensal e acompanha tudo por aqui.';
+    // plano sem valor ainda: a pessoa entra na lista, não assina
+    $('#c-btn').textContent = !p ? 'Criar conta' : p.pagavel ? 'Criar conta e assinar' : 'Criar conta e entrar na lista';
+    $('#c-nada').hidden = !p || !!p.pagavel;
+  }
+  $('#etiqueta').innerHTML = etiqueta(p, rotulo) + (p && !logado ? '<a class="trocar link alvo" href="/#planos">Trocar de plano</a>' : '');
+  $('#etiqueta').dataset.plano = p ? p.id : '';
+  if (p && p.id !== anterior) balancar();
+}
+
+function opcoes(marcado) {
+  return '<fieldset class="escolha"><legend>Escolha um plano</legend>' + D.planos.map((p) =>
+    '<label class="op"><input type="radio" name="pl" value="' + esc(p.id) + '"' + (p.id === marcado ? ' checked' : '') + '><b>' + esc(p.nome) + '</b>' +
+    '<span>' + (p.preco > 0 ? brl(p.preco) + ' por mês' : 'valor a definir') + '</span></label>').join('') + '</fieldset>';
+}
+
+function fichaPlano(recemEscolhido) {
+  const f = $('#ficha-plano'), a = CONTA.assinatura, escolhido = CONTA.plano && plano(CONTA.plano.id);
+  const ativa = a && /^(active|trialing)$/.test(a.status), atrasada = a && /^(past_due|unpaid)$/.test(a.status);
+  if (ativa || atrasada) {
+    const fim = a.fim ? (a.cancelando ? 'Termina em ' : 'Renova em ') + dataBR(a.fim) + '.' : '';
+    f.innerHTML = '<h2>Plano ' + esc(a.nome) + '</h2>' +
+      '<div class="situ"><span class="selo' + (atrasada ? ' laranja' : '') + '">' + (atrasada ? 'Pagamento atrasado' : 'Ativo') + '</span><span>' + fim + '</span></div>' +
+      '<div class="acoes"><button class="btn btn-navy" type="button" id="gerenciar">' + (atrasada ? 'Atualizar pagamento' : 'Gerenciar assinatura') + '</button></div>' +
+      '<p class="ajuda">Troque o cartão ou cancele quando quiser.</p>';
+    $('#gerenciar').onclick = (e) => irPara(e.currentTarget, { acao: 'gerenciar' });
+    return;
+  }
+  if (escolhido && !f.dataset.trocando) {
+    const paga = escolhido.pagavel;
+    f.innerHTML = '<h2>Você escolheu o ' + esc(escolhido.nome) + '</h2>' +
+      (recemEscolhido ? '<div class="situ"><span class="selo" id="selo-lista">Na lista</span></div>' : '') +
+      (paga
+        ? '<p class="sub">Pague com cartão para ativar. A cobrança se repete todo mês e você cancela quando quiser.</p><div class="acoes"><button class="btn btn-laranja" type="button" id="pagar">Pagar e ativar o plano</button></div>'
+        : '<p class="aviso-ok">Os valores dos planos ainda estão sendo definidos. Sua escolha ficou guardada, e a Lav-Flex chama você no WhatsApp quando o plano abrir.</p>') +
+      '<div class="acoes"><button class="btn btn-linha" type="button" id="trocar">Trocar de plano</button></div>';
+    if (paga) $('#pagar').onclick = (e) => irPara(e.currentTarget, { acao: 'assinar', plano: escolhido.id });
+    $('#trocar').onclick = () => { f.dataset.trocando = '1'; fichaPlano(); };
+    const selo = $('#selo-lista');
+    if (selo && !RM) selo.animate([{ transform: 'scale(2.2) rotate(-14deg)', opacity: 0 }, { transform: 'scale(.94) rotate(-5deg)', opacity: 1, offset: .7 }, { transform: 'rotate(-5deg)' }], { duration: 420, easing: 'cubic-bezier(.3,.6,.4,1)' });
+    return;
+  }
+  f.innerHTML = '<h2>' + (escolhido ? 'Trocar de plano' : 'Escolha seu plano') + '</h2>' +
+    '<form id="f-plano">' + opcoes(escolhido ? escolhido.id : planoUrl) + '<p class="erro" id="p-erro" role="alert"></p>' +
+    '<div class="acoes"><button class="btn btn-laranja" type="submit" id="p-btn">Escolher este plano</button>' +
+    (escolhido ? '<button class="btn btn-linha" type="button" id="p-cancelar">Voltar</button>' : '') + '</div></form>';
+  $('#f-plano').onsubmit = async (e) => {
+    e.preventDefault();
+    const id = ($('input[name=pl]:checked', f) || {}).value;
+    if (!id) { $('#p-erro').textContent = 'Escolha um dos planos.'; return; }
+    delete f.dataset.trocando;
+    await escolher(id, $('#p-btn'), $('#p-erro'));
+  };
+  if (escolhido) $('#p-cancelar').onclick = () => { delete f.dataset.trocando; fichaPlano(); };
+}
+
+// guarda o plano; se ele já tem valor e Stripe, segue para o pagamento
+async function escolher(id, botao, erroEl) {
+  botao.setAttribute('aria-busy', 'true');
+  try {
+    const j = await api({ acao: 'assinar', plano: id });
+    if (j.url) { location.href = j.url; return; }
+    CONTA = j.conta;
+    mostrar(); fichaPlano(true);
+    $('#ficha-plano').focus();
+  } catch (e) { erroEl.textContent = e.message; }
+  botao.removeAttribute('aria-busy');
+}
+async function irPara(botao, dados) {
+  botao.setAttribute('aria-busy', 'true');
+  try { const j = await api(dados); if (j.url) location.href = j.url; } catch (e) { alertaFicha(e.message); }
+  botao.removeAttribute('aria-busy');
+}
+function alertaFicha(msg) { $('#ficha-plano').insertAdjacentHTML('beforeend', '<p class="erro" role="alert">' + esc(msg) + '</p>'); }
+
+// ---------- criar conta / entrar ----------
+$$('.seg button').forEach((b) => (b.onclick = () => {
+  const criar = b.dataset.modo === 'criar';
+  $$('.seg button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+  $('#f-criar').hidden = !criar; $('#f-entrar').hidden = criar;
+  (criar ? $('#c-nome') : $('#e-email')).focus();
+}));
+
+$('#f-criar').onsubmit = async (e) => {
+  e.preventDefault();
+  const erro = $('#c-erro'), btn = $('#c-btn');
+  erro.textContent = '';
+  $$('#f-criar .inp').forEach((i) => i.removeAttribute('aria-invalid'));
+  const v = { nome: $('#c-nome').value.trim(), email: $('#c-email').value.trim(), tel: $('#c-tel').value.replace(/\D/g, ''), senha: $('#c-senha').value };
+  const falta = !v.nome ? ['#c-nome', 'Escreva seu nome.'] : !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email) ? ['#c-email', 'Confira o e-mail.']
+    : v.tel.length < 10 ? ['#c-tel', 'Escreva o WhatsApp com DDD.'] : v.senha.length < 6 ? ['#c-senha', 'A senha precisa de pelo menos 6 caracteres.'] : null;
+  if (falta) { erro.textContent = falta[1]; $(falta[0]).setAttribute('aria-invalid', 'true'); $(falta[0]).focus(); return; }
+  btn.setAttribute('aria-busy', 'true');
+  try {
+    const j = await api(Object.assign({ acao: 'criar', plano: plano(planoUrl) ? planoUrl : undefined }, v));
+    guardar(j.token); CONTA = j.conta;
+    const p = CONTA.plano && plano(CONTA.plano.id);
+    if (p && p.pagavel) { await escolher(p.id, btn, erro); return; }
+    mostrar(); fichaPlano(!!p);
+    $('#ficha-plano').focus();
+  } catch (er) { erro.textContent = er.message; }
+  btn.removeAttribute('aria-busy');
+};
+
+$('#f-entrar').onsubmit = async (e) => {
+  e.preventDefault();
+  const erro = $('#e-erro'), btn = $('#e-btn');
+  erro.textContent = '';
+  btn.setAttribute('aria-busy', 'true');
+  try {
+    const j = await api({ acao: 'entrar', email: $('#e-email').value.trim(), senha: $('#e-senha').value });
+    guardar(j.token); CONTA = j.conta;
+    // veio de um plano do site e ainda não tem plano: já abre a escolha marcada
+    if (plano(planoUrl) && !CONTA.plano && !CONTA.assinatura) $('#ficha-plano').dataset.trocando = '1';
+    mostrar();
+  } catch (er) { erro.textContent = er.message; }
+  btn.removeAttribute('aria-busy');
+};
+
+$('#sair').onclick = () => { guardar(''); mostrar(); $('#caixa-acesso').hidden = false; };
+
+$('#f-rastro').onsubmit = (e) => {
+  e.preventDefault();
+  const c = $('#r-cod').value.toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^LF(?=[A-Z0-9]{6}$)/, '');
+  if (c.length === 6) location.href = '/r/' + c;
+  else $('#r-cod').setAttribute('aria-invalid', 'true');
+};
+
+// ---------- início ----------
+async function iniciar() {
+  try {
+    const j = await (await fetch('/api/data')).json();
+    if (j && j.ok && j.data) {
+      if (j.data.planos) D.planos = j.data.planos;
+      D.loja = Object.assign(D.loja, j.data.loja || {});
+    }
+  } catch (e) {}
+  $$('[data-wa]').forEach((a) => (a.href = 'https://wa.me/' + String(D.loja.whatsapp || '').replace(/\D/g, '') + '?text=' + encodeURIComponent(a.dataset.wa)));
+  if (TOKEN) { try { CONTA = (await api(null, 'GET')).conta; } catch (e) { guardar(''); } }
+  mostrar();
+  if (CONTA && plano(planoUrl) && !CONTA.assinatura && (!CONTA.plano || CONTA.plano.id !== planoUrl)) { $('#ficha-plano').dataset.trocando = '1'; fichaPlano(); }
+  // voltou do pagamento: o Stripe avisa o servidor em alguns segundos
+  if (CONTA && params.get('pago') && !CONTA.assinatura) {
+    $('#ficha-plano').insertAdjacentHTML('afterbegin', '<p class="aviso-ok">Pagamento recebido. Sua assinatura aparece aqui em alguns segundos.</p>');
+    setTimeout(async () => { try { CONTA = (await api(null, 'GET')).conta; mostrar(); } catch (e) {} }, 4000);
+  }
+}
+iniciar();
+</script>
+</body>
+</html>
