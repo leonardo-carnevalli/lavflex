@@ -1,5 +1,7 @@
 # Lav-Flex na VPS
 
+> **25/11/2026:** o plano agora é `vetor/infra/vps/MIGRACAO-2026-11.md` (VPS Hostinger com Docker e Caddy, sem Coolify). Manifesto: `vetor/infra/vps/deploy/apps/lavflex-marilia.json`; bloco do Caddy: `vetor/infra/vps/caddy/sites/lavflex-marilia.caddy`; env: `vetor/.segredos/vps-env/lavflex-marilia.env`. Domínio: `lavflex.vetoragencia.com.br` (o `build.cjs` passou a usar esse endereço no canonical e no sitemap). `compose.yml` nesta pasta; dados em `/srv/vetor/data/lavflex-marilia`. As etiquetas já impressas com `lavflex-marilia.vercel.app/r/...` não abrem mais (a Vercel está fora). O resto deste arquivo é de 21/10 (Coolify) e fica só como referência.
+
 Contrato: `vetor/infra/vps/TECNICO.md` (4.6). Na Vercel nada muda: `ARMAZEM` não existe lá e o site segue no Blob.
 
 - **Domínio alvo:** `lavflex.vetoragencia.com.br` (ensaio em `lavflex.vps.vetoragencia.com.br`). Os links e QR de rastreio usam `location.origin`; etiquetas já impressas com `lavflex-marilia.vercel.app/r/...` dependem do redirecionamento na Vercel (TECNICO P5).

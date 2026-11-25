@@ -1,0 +1,15 @@
+# VPS (vetor/infra/vps/MIGRACAO-2026-11.md): container na rede web, atrás do Caddy, sem porta no host.
+services:
+  lavflex-marilia:
+    build: .
+    image: lavflex-marilia
+    container_name: lavflex-marilia
+    restart: unless-stopped
+    env_file: /srv/vetor/env/lavflex-marilia.env
+    volumes:
+      - /srv/vetor/data/lavflex-marilia:/data
+    networks: [web]
+
+networks:
+  web:
+    external: true

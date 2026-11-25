@@ -4,7 +4,7 @@ const path = require('path');
 
 const ROOT = __dirname;
 const OUT = path.join(ROOT, 'public');
-const SITE = process.env.SITE_URL || 'https://lavflex-marilia.vercel.app'; // trocar quando tiver o subdomínio
+const SITE = process.env.SITE_URL || 'https://lavflex.vetoragencia.com.br';
 
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
