@@ -186,6 +186,43 @@ p { margin: 0 0 1em; }
 .dica { display: inline-block; min-height: 44px; margin-top: 7px; padding: 11px 0; border: 0; background: none; cursor: pointer; font-size: .9rem; color: var(--navy); font-weight: 600; text-decoration: underline dotted; text-underline-offset: 4px; text-align: left; }
 .dica b { font-stretch: 70%; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
 .ajuda { margin: 12px 0 0; font-size: .86rem; color: var(--suave); line-height: 1.4; }
+.rot-senha { margin-top: 14px; }
+.tag[hidden] { display: none; }
+/* área do cliente: ordens que vêm do sistema da loja */
+.ordens { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.ordem { border: 1px solid #D5E0EC; border-radius: 12px; padding: 16px; display: grid; gap: 8px; background: #fff; }
+.ordem-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 12px; }
+.ordem-rol { font-weight: 700; font-variant-numeric: tabular-nums; }
+.ordem p { margin: 0; color: var(--suave); font-size: .92rem; line-height: 1.4; }
+.ordem .ordem-pg { color: #8A3D0D; font-weight: 600; }
+.ordem .ordem-pg.pago { color: #1D5C2A; }
+.ord-selo { display: inline-block; font-size: .8rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--algodao); color: var(--navy); box-shadow: inset 0 0 0 1px var(--linha); }
+.ord-selo.pronto { background: #FCE9DA; color: #8A3D0D; box-shadow: none; }
+.cli-atual { margin: 6px 0 0; color: var(--suave); font-size: .9rem; }
+.cli-resumo { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 26px 0 0; }
+.cli-resumo div { background: var(--algodao); border-radius: 12px; padding: 14px 16px; }
+.cli-resumo dt { font-size: .85rem; color: var(--suave); }
+.cli-resumo dd { margin: 4px 0 0; font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cli-resumo .verde { background: #E5F4E4; }
+.cli-resumo .verde dd { color: #1D5C2A; }
+.cli-resumo .laranja { background: #FCE9DA; }
+.cli-resumo .laranja dd { color: #8A3D0D; }
+@media (max-width: 560px) {
+  .cli-resumo { grid-template-columns: 1fr; gap: 8px; }
+  .cli-resumo div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 16px; }
+  .cli-resumo dd { margin: 0; font-size: 1.15rem; }
+}
+.cli-bloco + .cli-bloco { margin-top: 30px; }
+.hist { list-style: none; margin: 0; padding: 0; }
+.hist li { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--linha); font-size: .92rem; }
+.hist li:first-child { padding-top: 0; }
+.hist span { min-width: 0; }
+.hist small { display: block; color: var(--suave); font-size: .82rem; margin-top: 2px; }
+.hist b { white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
+.hist b small { font-weight: 600; }
+.hist .menos { color: #8A3D0D; }
+.hist .mais { color: #1D5C2A; }
+.cli-acoes { margin-top: 30px; }
 
 /* resultado do rastreio: o recibo que sai da comanda */
 .resultado { position: relative; z-index: 1; padding: 0 0 64px; scroll-margin-top: 80px; }
@@ -683,6 +720,25 @@ p { margin: 0 0 1em; }
                 <button class="btn btn-navy btn-bloco" type="submit" id="btn-rastrear">Rastrear</button>
                 <button type="button" class="dica" id="dica">Teste com o código de exemplo <b>LF-7K3M9P</b></button>
                 <p class="ajuda" id="codigo-ajuda">O código vem impresso na comanda que você recebe no balcão, junto com um QR code.</p>
+                <button type="button" class="dica" data-trocar="cliente">Já é cliente cadastrado? <b>Entre com seu número</b></button>
+              </div>
+            </form>
+            <form class="tag" id="form-cliente" novalidate hidden>
+              <div class="tag-stub">
+                <img src="/img/logo.webp" alt="" width="44" height="44">
+                <p><b>Lav-<i>Flex</i></b><br>Área do cliente</p>
+                <p class="no-tag" aria-hidden="true">Via do<br>cliente</p>
+              </div>
+              <div class="tag-corpo">
+                <h2 class="tag-tit">Minhas roupas</h2>
+                <label for="cli-numero">Número do cliente</label>
+                <input class="campo" id="cli-numero" name="cliente" inputmode="numeric" autocomplete="username" placeholder="Ex.: 16" maxlength="9" aria-describedby="cli-erro cli-ajuda">
+                <label for="cli-senha" class="rot-senha">Senha</label>
+                <input class="campo" id="cli-senha" name="senha" type="password" inputmode="numeric" autocomplete="current-password" placeholder="0000" maxlength="4" aria-describedby="cli-erro cli-ajuda">
+                <p class="erro" id="cli-erro" role="alert"></p>
+                <button class="btn btn-navy btn-bloco" type="submit" id="btn-cliente">Entrar</button>
+                <p class="ajuda" id="cli-ajuda">O número do cliente vem impresso na sua nota. A senha são os 4 últimos números do telefone cadastrado na loja.</p>
+                <button type="button" class="dica" data-trocar="codigo">Tenho um código de comanda <b>LF-…</b></button>
               </div>
             </form>
           </div>
@@ -1386,6 +1442,114 @@ async function rastrear(valor, { auto } = {}) {
 }
 
 $('#form-rastreio').addEventListener('submit', (e) => { e.preventDefault(); rastrear(campo.value); });
+
+// ---------- área do cliente (ordens que o sistema da loja manda para o site) ----------
+const fCli = $('#form-cliente'), cliNum = $('#cli-numero'), cliSenha = $('#cli-senha'), cliErro = $('#cli-erro'), btnCli = $('#btn-cliente');
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-trocar]');
+  if (!t) return;
+  const cli = t.dataset.trocar === 'cliente';
+  fCli.hidden = !cli; $('#form-rastreio').hidden = cli;
+  (cli ? cliNum : campo).focus();
+});
+function dataCurta(s) {
+  const m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? m[3] + '/' + m[2] : '';
+}
+// pagamento como o sistema da loja marca: Pago, Pago parcial ou Pendente
+function pagamentoTxt(o) {
+  if (o.pagamento === 'pago') return 'Pago';
+  if (o.pagamento === 'parcial') return o.restante > 0 ? 'Pago em parte · falta ' + brl(o.restante) : 'Pago em parte';
+  return o.total > 0 ? 'A pagar ' + brl(o.total) : 'Pagamento pendente';
+}
+// o sistema guarda uma peça por linha ("2x CAMISA\n1x CALÇA"); no site vira "2x CAMISA, 1x CALÇA"
+const pecasTxt = (d) => String(d || '').split(/\n+/).map((l) => l.trim()).filter(Boolean).join(', ');
+function ordemHTML(o) {
+  o = Object.assign({}, o, { descricao: pecasTxt(o.descricao) });
+  const prod = o.producao === 'pronto' ? (o.entrega === 'entrega' ? 'Pronto para entrega' : 'Pronto para retirada') : 'Em produção';
+  const det = [];
+  if (o.pecas) det.push(o.pecas + (o.pecas === 1 ? ' peça' : ' peças'));
+  if (o.entrada) det.push('entrada ' + dataCurta(o.entrada));
+  if (o.producao === 'producao' && o.previsao) det.push('previsão ' + dataCurta(o.previsao));
+  return '<li class="ordem"><div class="ordem-topo"><span class="ordem-rol">Rol ' + o.rol + '</span><span class="ord-selo ' + (o.producao === 'pronto' ? 'pronto' : '') + '">' + esc(prod) + '</span></div>' +
+    (o.descricao ? '<p>' + esc(o.descricao) + '</p>' : '') +
+    (det.length ? '<p>' + esc(det.join(' · ')) + '</p>' : '') +
+    '<p class="ordem-pg' + (o.pagamento === 'pago' ? ' pago' : '') + '">' + esc(pagamentoTxt(o)) + '</p></li>';
+}
+function histHTML(o) {
+  o = Object.assign({}, o, { descricao: pecasTxt(o.descricao) });
+  const data = dataCurta(o.entrada || o.previsao);
+  const pago = o.pagamento === 'pago';
+  return '<li><span>Rol ' + o.rol + (o.descricao ? ' · ' + esc(o.descricao.length > 60 ? o.descricao.slice(0, 58) + '…' : o.descricao) : '') +
+    '<small>' + esc([data, o.pecas ? o.pecas + (o.pecas === 1 ? ' peça' : ' peças') : ''].filter(Boolean).join(' · ')) + '</small></span>' +
+    '<b>' + brl(o.total) + '<small class="' + (pago ? 'mais' : 'menos') + '">' + esc(pago ? 'Pago' : pagamentoTxt(o)) + '</small></b></li>';
+}
+const TIPO_CRED = { entrada: 'Crédito adicionado', uso: 'Usado em pedido', estorno: 'Crédito devolvido' };
+function creditoHTML(m) {
+  const menos = m.tipo === 'uso';
+  // na entrada, o motivo escrito no balcão (ex.: "Devolução de 30 cabides") diz mais que "Crédito adicionado"
+  const titulo = m.tipo === 'entrada' && m.obs ? m.obs : (TIPO_CRED[m.tipo] || 'Crédito') + (m.rol ? ' (rol ' + m.rol + ')' : '');
+  return '<li><span>' + esc(titulo) +
+    '<small>' + esc([dataCurta(m.data), 'saldo ' + brl(m.saldo)].filter(Boolean).join(' · ')) + '</small></span>' +
+    '<b class="' + (menos ? 'menos' : 'mais') + '">' + (menos ? '− ' : '+ ') + brl(m.valor) + '</b></li>';
+}
+function clienteHTML(j) {
+  const c = j.cliente;
+  const abertas = j.ordens.filter((o) => o.producao !== 'entregue');
+  // já entregue mas sem pagar: fica num bloco próprio, para o cliente ver de onde vem o "Falta pagar"
+  const devendo = j.ordens.filter((o) => o.producao === 'entregue' && o.pagamento !== 'pago');
+  const entregues = j.ordens.filter((o) => o.producao === 'entregue' && o.pagamento === 'pago');
+  const prontas = abertas.filter((o) => o.producao === 'pronto').length;
+  const tit = !abertas.length ? 'nenhuma roupa na loja agora.' : prontas ? (prontas === abertas.length ? 'sua roupa está pronta.' : 'parte da sua roupa está pronta.') : 'sua roupa está em produção.';
+  const creditos = c.creditos || [];
+  return '<p class="recibo-cod">Cliente nº ' + c.numero + '</p>' +
+    '<h2 class="tit rec-tit" id="res-titulo">' + esc(maiuscula((c.nome ? c.nome + ', ' : '') + tit)) + '</h2>' +
+    (j.atualizado ? '<p class="cli-atual">Atualizado pelo sistema da loja em ' + quando(j.atualizado) + '.</p>' : '') +
+    '<dl class="cli-resumo">' +
+      (c.aPagar > 0
+        ? '<div class="laranja"><dt>Falta pagar</dt><dd>' + brl(c.aPagar) + '</dd></div>'
+        : '<div class="verde"><dt>Pagamentos</dt><dd>Tudo pago</dd></div>') +
+      '<div' + (c.credito > 0 ? ' class="verde"' : '') + '><dt>Crédito na loja</dt><dd>' + brl(c.credito || 0) + '</dd></div>' +
+      '<div><dt>Pedidos feitos</dt><dd>' + (c.pedidos || 0) + '</dd></div>' +
+      '<div><dt>Total em pedidos</dt><dd>' + brl(c.gasto || 0) + '</dd></div>' +
+    '</dl>' +
+    '<div class="recibo-grade">' +
+      '<div class="cli-bloco"><h3>Na loja agora</h3>' + (abertas.length ? '<ul class="ordens">' + abertas.map(ordemHTML).join('') + '</ul>' : '<p class="balcao">Nenhuma roupa na loja agora.</p>') + '</div>' +
+      '<div>' +
+        (devendo.length ? '<div class="cli-bloco"><h3>Entregues sem pagamento</h3><ul class="hist">' + devendo.map(histHTML).join('') + '</ul></div>' : '') +
+        '<div class="cli-bloco"><h3>Histórico</h3>' + (entregues.length ? '<ul class="hist">' + entregues.slice(0, 20).map(histHTML).join('') + '</ul>' : '<p class="balcao">Os pedidos entregues aparecem aqui.</p>') + '</div>' +
+        (creditos.length ? '<div class="cli-bloco"><h3>Movimento do crédito</h3><ul class="hist">' + creditos.map(creditoHTML).join('') + '</ul></div>' : '') +
+      '</div>' +
+    '</div>' +
+    '<div class="recibo-acoes cli-acoes"><a class="btn btn-navy" target="_blank" rel="noopener" href="' + esc(waLink('Olá! Sou o cliente nº ' + c.numero + ' e quero falar sobre minha roupa.')) + '"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><use href="#i-zap"/></svg>Falar com a loja</a>' +
+    '<button class="btn-txt link alvo" type="button" data-ir-rastreio data-sair>Sair</button></div>';
+}
+// "Sair" some com as ordens da tela e volta para o formulário
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('[data-sair]')) return;
+  $('#resultado').hidden = true; $('#recibo').innerHTML = ''; cliNum.value = ''; cliSenha.value = '';
+});
+fCli.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  cliErro.textContent = '';
+  const numero = cliNum.value.replace(/\D/g, ''), senha = cliSenha.value.replace(/\D/g, '');
+  if (!numero || senha.length !== 4) { cliErro.textContent = 'Digite o número do cliente e os 4 últimos números do seu telefone.'; return; }
+  btnCli.setAttribute('aria-busy', 'true'); btnCli.textContent = 'Entrando…';
+  let j;
+  try {
+    const r = await fetch('/api/cliente', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ cliente: numero, senha }) });
+    j = await r.json().catch(() => ({}));
+    if (!r.ok && !j.error) j.error = 'Não consegui consultar agora. Tente de novo em instantes.';
+  } catch (err) { j = { error: 'Sem conexão. Confira a internet e tente de novo.' }; }
+  btnCli.removeAttribute('aria-busy'); btnCli.textContent = 'Entrar';
+  if (j.error || !j.ok) { $('#resultado').hidden = true; cliErro.textContent = j.error || 'Não consegui entrar.'; return; }
+  cliSenha.value = '';
+  const sec = $('#resultado'), rec = $('#recibo');
+  rec.innerHTML = clienteHTML(j);
+  sec.hidden = false;
+  sec.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' });
+  rec.focus({ preventScroll: true });
+});
 campo.addEventListener('input', () => { if (erroEl.textContent) limparErro(); });
 $('#dica').addEventListener('click', () => { campo.value = 'LF-7K3M9P'; limparErro(); campo.focus(); });
 // links "Rastrear" levam até a comanda e já põem o cursor no campo

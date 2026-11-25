@@ -7,3 +7,4 @@ public
 .dados-local.json
 Dockerfile
 .dockerignore
+integracao-sistema
