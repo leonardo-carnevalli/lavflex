@@ -1,6 +1,8 @@
 # Instala a integracao Lav-Flex <-> site no PC da loja (Vetor Agencia).
 # Uso (PowerShell, colar inteiro):
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/leonardo-carnevalli/lavflex/main/integracao-sistema/instalar.ps1))) -Chave "<SISTEMA_CHAVE>"
+# So gravar/trocar a chave depois (sem reinstalar):
+#   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/leonardo-carnevalli/lavflex/main/integracao-sistema/instalar.ps1))) -SoConfig -Chave "<SISTEMA_CHAVE>"
 # Desfazer:
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/leonardo-carnevalli/lavflex/main/integracao-sistema/instalar.ps1))) -Desfazer
 # O que faz: acha o Lav-Flex instalado, fecha o programa, guarda copia do app.asar, aplica a integracao
@@ -12,7 +14,8 @@ param(
   [string]$Site = "https://lavflex.vetoragencia.com.br",
   [string]$SiteImpresso = "lavflexmarilia.com.br",
   [string]$Pasta = "",
-  [switch]$Desfazer
+  [switch]$Desfazer,
+  [switch]$SoConfig
 )
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
@@ -57,7 +60,9 @@ function Fechar-Programa {
 
 # Desfazer: volta a copia mais recente
 if ($Desfazer) {
-  $bk = Get-ChildItem $Res -Directory -Filter "vetor-backup-*" | Sort-Object Name -Descending | Select-Object -First 1
+  # a copia mais recente que ainda NAO tem a integracao (o asar nao e comprimido: o nome do arquivo aparece no cabecalho)
+  $bk = Get-ChildItem $Res -Directory -Filter "vetor-backup-*" | Sort-Object Name -Descending |
+    Where-Object { -not (Select-String -Path (Join-Path $_.FullName "app.asar") -Pattern "vetor-sync.js" -SimpleMatch -Quiet) } | Select-Object -First 1
   if (-not $bk) { Falha "Nao achei copia vetor-backup-* em $Res" }
   Fechar-Programa
   Remove-Item (Join-Path $Res "app.asar") -Force
@@ -66,6 +71,23 @@ if ($Desfazer) {
   if (Test-Path (Join-Path $bk.FullName "app.asar.unpacked")) { Copy-Item (Join-Path $bk.FullName "app.asar.unpacked") (Join-Path $Res "app.asar.unpacked") -Recurse }
   Diga "Voltei a copia $($bk.Name). Abrindo o Lav-Flex."
   Start-Process $Exe
+  return
+}
+
+function Gravar-Config {
+  $Dados = Join-Path $env:APPDATA "lavflex-sistema"
+  New-Item -ItemType Directory -Force $Dados | Out-Null
+  $Cfg = Join-Path $Dados "vetor-sync.json"
+  $obj = [ordered]@{ site = $Site; chave = $Chave; siteImpresso = $SiteImpresso }
+  if (-not $Chave) { $obj.Remove("chave"); Diga "Sem -Chave: o envio ao site fica desligado; a nota ja sai com o endereco do site." }
+  [IO.File]::WriteAllText($Cfg, ($obj | ConvertTo-Json), (New-Object Text.UTF8Encoding $false))
+  Diga "Configuracao em: $Cfg"
+}
+if ($SoConfig) {
+  Gravar-Config
+  Fechar-Programa
+  Start-Process $Exe
+  Diga "Chave gravada e Lav-Flex reaberto. O envio ao site comeca em ate 30 s."
   return
 }
 
@@ -136,13 +158,7 @@ $Trocado = $true
 }
 
 # 7. Configuracao (UTF-8 sem BOM, que o Node le direito)
-$Dados = Join-Path $env:APPDATA "lavflex-sistema"
-New-Item -ItemType Directory -Force $Dados | Out-Null
-$Cfg = Join-Path $Dados "vetor-sync.json"
-$obj = [ordered]@{ site = $Site; chave = $Chave; siteImpresso = $SiteImpresso }
-if (-not $Chave) { $obj.Remove("chave"); Diga "Sem -Chave: o envio ao site fica desligado; a nota ja sai com o endereco do site." }
-[IO.File]::WriteAllText($Cfg, ($obj | ConvertTo-Json), (New-Object Text.UTF8Encoding $false))
-Diga "Configuracao em: $Cfg"
+Gravar-Config
 
 # 8. Abre e confere
 Diga "Abrindo o Lav-Flex e conferindo"
@@ -156,7 +172,7 @@ if ($ok) {
   Diga "PRONTO. Integracao respondendo (configurado: $($ok.configurado))."
   Write-Host "   - Na lista do Atendimento aparece o botao 'Marcar pronto'."
   Write-Host "   - A nota sai com 'ACOMPANHE NO SITE', o numero do cliente e a senha."
-  Write-Host "   - Para desfazer: o mesmo comando com -Desfazer no lugar de -Chave."
+  Write-Host "   - Para desfazer: o mesmo comando trocando o final por -Desfazer."
 } else {
   Write-Host "!! O programa abriu mas a integracao nao respondeu em 60 s. Confira se o Lav-Flex abriu normal." -ForegroundColor Yellow
   Write-Host "!! Se algo estiver errado, rode o comando com -Desfazer (volta a copia $Bk)." -ForegroundColor Yellow
