@@ -22,15 +22,18 @@ const unico = (txt, ancora, nome) => {
 for (const f of ['vetor-sync.js', 'vetor-sync-ui.js']) fs.copyFileSync(path.join(__dirname, f), path.join(pasta, f));
 
 const arqServer = path.join(pasta, 'server.js');
-let s = fs.readFileSync(arqServer, 'utf8');
+// aceita arquivo com quebra de linha do Windows (CRLF): trabalha em LF e devolve como estava
+const ler = (f) => { const t = fs.readFileSync(f, 'utf8'); return { crlf: t.includes('\r\n'), txt: t.replace(/\r\n/g, '\n') }; };
+const gravar = (f, txt, crlf) => fs.writeFileSync(f, crlf ? txt.replace(/\n/g, '\r\n') : txt);
+let { txt: s, crlf: crlfS } = ler(arqServer);
 if (!s.includes("require('./vetor-sync.js')")) {
   const i = unico(s, 'global.db = db;\n', 'server.js global.db');
   s = s.slice(0, i) + "require('./vetor-sync.js')(app, db); // integração com o site (Vetor Agência)\n" + s.slice(i);
-  fs.writeFileSync(arqServer, s);
+  gravar(arqServer, s, crlfS);
 }
 
 const arqIndex = path.join(pasta, 'index.html');
-let h = fs.readFileSync(arqIndex, 'utf8');
+let { txt: h, crlf: crlfH } = ler(arqIndex);
 if (!h.includes('vetor-sync-ui.js')) {
   const i = h.lastIndexOf('</body>');
   if (i < 0) throw new Error('index.html sem </body>');
@@ -50,5 +53,5 @@ if (!h.includes('vetorLogin')) {
     '            ${vetorLogin && vetorLogin.cliente && vetorLogin.site ? `<div class="centro" style="font-size: 11px; margin: 3px 0 5px; line-height: 1.35;">ACOMPANHE NO SITE<br>${escapeHtml(vetorLogin.site)}<br>Nº do cliente: <b style="font-size: 14px;">${vetorLogin.cliente}</b><br>Senha: 4 últimos números do seu telefone</div>` : \'\'}\n' +
     h.slice(i);
 }
-fs.writeFileSync(arqIndex, h);
+gravar(arqIndex, h, crlfH);
 console.log('Integração aplicada em ' + pasta);
