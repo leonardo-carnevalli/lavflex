@@ -3,6 +3,8 @@
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/leonardo-carnevalli/lavflex/main/integracao-sistema/instalar.ps1))) -Chave "<SISTEMA_CHAVE>"
 # So gravar/trocar a chave depois (sem reinstalar):
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/leonardo-carnevalli/lavflex/main/integracao-sistema/instalar.ps1))) -SoConfig -Chave "<SISTEMA_CHAVE>"
+# Com o site rodando neste PC (so neste computador; para testar e usar na loja):
+#   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/leonardo-carnevalli/lavflex/main/integracao-sistema/instalar.ps1))) -SiteLocal
 # Desfazer:
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/leonardo-carnevalli/lavflex/main/integracao-sistema/instalar.ps1))) -Desfazer
 # O que faz: acha o Lav-Flex instalado, fecha o programa, guarda copia do app.asar, aplica a integracao
@@ -15,7 +17,8 @@ param(
   [string]$SiteImpresso = "lavflexmarilia.com.br",
   [string]$Pasta = "",
   [switch]$Desfazer,
-  [switch]$SoConfig
+  [switch]$SoConfig,
+  [switch]$SiteLocal
 )
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
@@ -83,35 +86,85 @@ function Gravar-Config {
   [IO.File]::WriteAllText($Cfg, ($obj | ConvertTo-Json), (New-Object Text.UTF8Encoding $false))
   Diga "Configuracao em: $Cfg"
 }
-if ($SoConfig) {
-  Gravar-Config
-  Fechar-Programa
-  Start-Process $Exe
-  Diga "Chave gravada e Lav-Flex reaberto. O envio ao site comeca em ate 30 s."
-  return
-}
-
-# 2. Node: usa o do PC; se nao tiver, baixa o oficial (nodejs.org) numa pasta temporaria
+# 2. Node: usa o do PC; se nao tiver, baixa o oficial (nodejs.org) para %LOCALAPPDATA%\vetor-lavflex\node
+$Base = Join-Path $env:LOCALAPPDATA "vetor-lavflex"
+New-Item -ItemType Directory -Force $Base | Out-Null
 $Tmp = Join-Path $env:TEMP ("vetor-lavflex-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
 New-Item -ItemType Directory -Force $Tmp | Out-Null
+$v = "v22.11.0"
+$NodeLocal = Join-Path $Base "node\node-$v-win-x64"
 $node = (Get-Command node -ErrorAction SilentlyContinue).Source
-if ($node) { $NodeDir = Split-Path $node } else {
-  Diga "Node nao instalado; baixando o Node oficial (nodejs.org) so para esta instalacao"
-  $v = "v22.11.0"
+if (Test-Path "$NodeLocal\node.exe") { $NodeDir = $NodeLocal }
+elseif ($node) { $NodeDir = Split-Path $node }
+else {
+  Diga "Node nao instalado; baixando o Node oficial (nodejs.org)"
   Invoke-WebRequest "https://nodejs.org/dist/$v/node-$v-win-x64.zip" -OutFile "$Tmp\node.zip" -UseBasicParsing
-  Expand-Archive "$Tmp\node.zip" "$Tmp\node" -Force
-  $NodeDir = "$Tmp\node\node-$v-win-x64"
+  Expand-Archive "$Tmp\node.zip" (Join-Path $Base "node") -Force
+  $NodeDir = $NodeLocal
 }
 $env:Path = "$NodeDir;$env:Path"
 $Npx = Join-Path $NodeDir "npx.cmd"
 $NodeExe = Join-Path $NodeDir "node.exe"
 
-# 3. Arquivos da integracao (deste repositorio)
-Diga "Baixando a integracao"
+# 3. Arquivos deste repositorio (integracao e site)
+Diga "Baixando a integracao e o site"
 Invoke-WebRequest "https://github.com/leonardo-carnevalli/lavflex/archive/refs/heads/main.zip" -OutFile "$Tmp\repo.zip" -UseBasicParsing
 Expand-Archive "$Tmp\repo.zip" "$Tmp\repo" -Force
-$Integ = Get-ChildItem "$Tmp\repo" -Directory | Select-Object -First 1 | ForEach-Object { Join-Path $_.FullName "integracao-sistema" }
+$Repo = (Get-ChildItem "$Tmp\repo" -Directory | Select-Object -First 1).FullName
+$Integ = Join-Path $Repo "integracao-sistema"
 if (-not (Test-Path "$Integ\aplicar.cjs")) { Falha "Download da integracao incompleto" }
+
+# 3b. Site local neste PC (opcional, -SiteLocal): roda em http://127.0.0.1:5180 e liga sozinho com o Windows
+if ($SiteLocal) {
+  $SiteDir = Join-Path $Base "site"
+  $EnvFile = Join-Path $Base "site.env"
+  # para o site se ja estiver rodando
+  Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*dev.cjs*" -and $_.ExecutablePath -eq $NodeExe } |
+    ForEach-Object { Invoke-CimMethod -InputObject $_ -MethodName Terminate | Out-Null }
+  Start-Sleep -Seconds 1
+  # codigo novo, mantendo os dados do site (.dados-local.json)
+  $Dad = Join-Path $SiteDir ".dados-local.json"
+  if (Test-Path $Dad) { Copy-Item $Dad "$Tmp\dados.json" }
+  if (Test-Path $SiteDir) { Remove-Item $SiteDir -Recurse -Force }
+  New-Item -ItemType Directory -Force $SiteDir | Out-Null
+  Get-ChildItem $Repo -Force | Where-Object { $_.Name -ne "integracao-sistema" } | ForEach-Object { Copy-Item $_.FullName $SiteDir -Recurse -Force }
+  if (Test-Path "$Tmp\dados.json") { Copy-Item "$Tmp\dados.json" $Dad }
+  # chave: a que veio em -Chave, ou a que ja existe neste PC, ou uma nova
+  if (-not $Chave -and (Test-Path $EnvFile)) {
+    $l = Get-Content $EnvFile | Where-Object { $_ -match "^SISTEMA_CHAVE=" } | Select-Object -First 1
+    if ($l) { $Chave = $l.Substring(14).Trim() }
+  }
+  if (-not $Chave) {
+    $b = New-Object byte[] 16
+    (New-Object Security.Cryptography.RNGCryptoServiceProvider).GetBytes($b)
+    $Chave = -join ($b | ForEach-Object { $_.ToString("x2") })
+  }
+  [IO.File]::WriteAllText($EnvFile, "SISTEMA_CHAVE=$Chave`r`nPORT=5180`r`n", (New-Object Text.UTF8Encoding $false))
+  $Cmd = Join-Path $Base "iniciar-site.cmd"
+  $cmdTxt = "@echo off`r`ncd /d ""$SiteDir""`r`nfor /f ""usebackq tokens=1,* delims=="" %%a in (""$EnvFile"") do set ""%%a=%%b""`r`n""$NodeExe"" dev.cjs >> ""$Base\site.log"" 2>&1`r`n"
+  [IO.File]::WriteAllText($Cmd, $cmdTxt, (New-Object Text.ASCIIEncoding))
+  $Vbs = Join-Path ([Environment]::GetFolderPath("Startup")) "Lav-Flex site local.vbs"
+  $vbsTxt = "CreateObject(""WScript.Shell"").Run """"""$Cmd"""""", 0, False`r`n"
+  [IO.File]::WriteAllText($Vbs, $vbsTxt, (New-Object Text.ASCIIEncoding))
+  Start-Process "wscript.exe" -ArgumentList """$Vbs"""
+  $subiu = $false
+  for ($i = 0; $i -lt 20; $i++) {
+    Start-Sleep -Seconds 1
+    try { if ((Invoke-WebRequest "http://127.0.0.1:5180/" -UseBasicParsing -TimeoutSec 3).StatusCode -eq 200) { $subiu = $true; break } } catch {}
+  }
+  if (-not $subiu) { Falha "O site local nao abriu em http://127.0.0.1:5180 (veja $Base\site.log)" }
+  Diga "Site local no ar: http://127.0.0.1:5180 (liga sozinho quando o Windows abre)"
+  $Site = "http://127.0.0.1:5180"
+}
+
+if ($SoConfig) {
+  Gravar-Config
+  Fechar-Programa
+  Start-Process $Exe
+  Diga "Configuracao gravada e Lav-Flex reaberto. O envio ao site comeca em ate 30 s."
+  Remove-Item $Tmp -Recurse -Force -ErrorAction SilentlyContinue
+  return
+}
 
 # 4. Copia de seguranca (antes de qualquer mudanca)
 try { [IO.File]::WriteAllText((Join-Path $Res "vetor-teste.tmp"), "x"); Remove-Item (Join-Path $Res "vetor-teste.tmp") -Force }

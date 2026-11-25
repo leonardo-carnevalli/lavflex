@@ -8,6 +8,8 @@ process.env.PAINEL_SENHA = process.env.PAINEL_SENHA || 'teste';
 delete process.env.BLOB_READ_WRITE_TOKEN;
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT) || 5180;
+// HOST=0.0.0.0 abre para a rede local (celular no mesmo Wi-Fi); o padrão é só este computador
+const HOST = process.env.HOST || '127.0.0.1';
 const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.css': 'text/css' };
 
 http.createServer((req, res) => {
@@ -31,8 +33,11 @@ http.createServer((req, res) => {
   if (/^\/r\/[^/]+$/.test(p) || p === '/') p = '/index.html';
   else if (p === '/painel') p = '/painel.html';
   else if (p === '/conta') p = '/conta.html';
+  // só os arquivos do site (os mesmos que o build.cjs publica); nada de .dados-local.json, api/ ou integracao-sistema/
+  const PUBLICOS = ['/index.html', '/painel.html', '/conta.html', '/seed.js', '/og.png'];
+  if (!PUBLICOS.includes(p) && !/^\/img\/[\w.\-\/]+$/.test(p)) { res.statusCode = 404; return res.end('404'); }
   const file = path.join(ROOT, path.normalize(p));
   if (!file.startsWith(ROOT) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.statusCode = 404; return res.end('404'); }
   res.setHeader('content-type', TIPOS[path.extname(file)] || 'application/octet-stream');
   fs.createReadStream(file).pipe(res);
-}).listen(PORT, () => console.log('http://localhost:' + PORT));
+}).listen(PORT, HOST, () => console.log('http://' + (HOST === '0.0.0.0' ? 'localhost' : HOST) + ':' + PORT));
